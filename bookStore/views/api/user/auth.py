@@ -122,7 +122,7 @@ def register():
         'answer': pwd_answer,
         'gender': gender,
         'mail': mail,
-        'phone': phone
+        'phone': phone,
         'qq': qq
     }
     # 创建用户的操作

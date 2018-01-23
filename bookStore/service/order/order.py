@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from bookStore import db
 from bookStore.mappings.order import Order
-from bookStore.mappings.order_detail import order_detail
+from bookStore.mappings.order_detail import OrderDetail
 
 class OrderService():
 
@@ -15,25 +15,34 @@ class OrderService():
             sql = """
             SELECT
                 *
-            FROM order
+            FROM `order`
             WHERE user_id = :user_id
             ORDER BY id DESC
             """
             rows = db.session.execute(sql, {"user_id": uid}).fetchall()
             for row in rows:
-                order = row.__dict__
+                order = {
+                    'order_id': row.order_id,
+                    'user_id': row.user_id,
+                    'quantity': row.quantity,
+                    'origin_cost': float(row.origin_cost),
+                    'actual_cost': float(row.actual_cost),
+                    'order_status': row.order_status,
+                    'delivery_status': row.delivery_status,
+                    'pay_status': row.pay_status
+                }
                 payload[row.order_id] = order
             return payload
 
         raise NotImplementedError('不支持的查询方式')
 
     @staticmethod
-    def order_detail_query(order_id)
+    def order_detail_query(order_id):
         """
         根据订单名查询 订单的详细书目信息
         """
         payload = {}
-        if uid:
+        if order_id:
             sql = """
             SELECT
                 *
@@ -43,7 +52,17 @@ class OrderService():
             """
             rows = db.session.execute(sql, {"order_id": order_id}).fetchall()
             for row in rows:
-                order_detail = row.__dict__
+                order_detail = {
+                    'order_id': row.order_id,
+                    'book_name': row.book_name,
+                    'isbn': row.isbn,
+                    'origin_price': float(row.origin_price),
+                    'actual_price': float(row.actual_price),
+                    'discount': float(row.discount),
+                    'order_quantity': row.order_quantity,
+                    'deliveried_quantity': row.deliveried_quantity,
+                    'warehouse': row.warehouse
+                }
                 payload[row.book_name] = order_detail
             return payload
 

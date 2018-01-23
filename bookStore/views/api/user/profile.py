@@ -41,7 +41,7 @@ def update_user_info():
         'password': password,
         'gender': gender,
         'mail': mail,
-        'phone': phone
+        'phone': phone,
         'qq': qq
     }
     # 创建用户的操作
