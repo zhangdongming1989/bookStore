@@ -1,6 +1,30 @@
 # -*- coding: utf-8 -*-
-from bookStore import db
+import hashlib
+from bookStore import db, app
 from bookStore.mappings.user import User
+
+
+class SiteUser():
+    user = None
+
+    def __init__(self, user):
+        self.user = user
+
+    @property
+    def is_authenticated(self):
+        return self.user is not None
+
+    @property
+    def is_active(self):
+        return False if self.user is None else self.user.is_active
+
+    @property
+    def is_anonymous(self):
+        return self.user is None
+
+    def get_id(self):
+        return 0 if self.user is None else self.user.id
+
 class UserService():
 
     @staticmethod
@@ -15,16 +39,18 @@ class UserService():
         if username:
             rv = db.session.query(User).filter_by(
                 username=username).first()
-            payload['username'] = rv['username']
-            payload['nickname'] = rv['nickname']
-            payload['realname'] = rv['realname']
-            payload['password'] = rv['password']
-            payload['phone'] = rv['phone']
-            payload['gender'] = rv['gender']
-            payload['mail'] = rv['mail']
-            payload['qq'] = rv['qq']
+            if rv:
+                payload['username'] = rv.username
+                payload['nickname'] = rv.nickname
+                payload['realname'] = rv.realname
+                payload['password'] = rv.password
+                payload['phone'] = rv.password
+                payload['gender'] = rv.gender
+                payload['mail'] = rv.mail
+                payload['qq'] = rv.qq
 
-            return payload
+                return payload
+            return None
 
         raise NotImplementedError('不支持的查询方式')
 
@@ -63,7 +89,7 @@ class UserService():
             m.update(_.encode('utf-8'))
             return m.hexdigest()
 
-        password = md5(md5(password))
+        # password = md5(md5(password))
         app.logger.info(password)
 
         user = User.query.filter_by(

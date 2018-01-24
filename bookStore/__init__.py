@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from flask import Flask
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from . import default_settings
 
@@ -22,7 +23,32 @@ class Application(Flask):
                 os.path.basename(__file__), '../dev.cfg'))
             self.config.from_pyfile(dev_cfg, silent=True)
 
+    def prepare_login_manager(self):
+        login_manager = LoginManager()
+        login_manager.init_app(self)
+
+        @login_manager.user_loader
+        def load_user(id):
+            from bookStore.service.user.user import UserService
+            return UserService.get(id)
+
     def ready(self):
         db.init_app(self)
+        self.prepare_login_manager()
+
+        if not app.debug:
+            import logging
+            from logging import StreamHandler
+            import sys
+
+            hdl = StreamHandler(sys.stderr)
+            fmt = logging.Formatter((
+                '[%(asctime)s %(levelname)-9s '
+                '%(module)s:%(lineno)d <%(process)d>] %(message)s'))
+
+            hdl.setFormatter(fmt)
+            hdl.setLevel(logging.INFO)
+            app.logger.addHandler(hdl)
+            app.logger.setLevel(logging.INFO)
 
 app = Application()

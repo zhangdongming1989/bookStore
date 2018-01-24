@@ -4,6 +4,7 @@ import logging
 from flask import request
 from flask_login import current_user, login_user, logout_user
 
+from bookStore import app, db
 from bookStore.service.user.user import UserService
 from bookStore.views.api import exports
 from bookStore.views import make_api_response
@@ -22,14 +23,21 @@ def login():
     @apiParam {String} username 用户账户名
     @apiParam {String} password 密码
     @apiParamExample {json} 请求样例：
-                  ?account=sodlinken&password=11223344&mobile=13739554137&vip=0&recommend=
+                    {
+                        "username": "bs",
+                        "password": "pwd"
+                    }
     @apiSuccess (200) {String} msg 信息
     @apiSuccess (200) {int} code 0 代表无错误 1代表有错误
     @apiSuccessExample {json} 返回样例:
                    {"status":"ok", "message": ""}
+    @apiError (400) {String} msg 信息
+    @apiErrorExample {json} 返回样例:
+                   {"status": "fail", "message": "参数错误：缺少用户名或密码"}
+                   {"status": "fail", "message": "参数错误：用户名或密码错误"}
     """
-    username = request.form['username']
-    password = request.form['password']
+    username = request.json['username']
+    password = request.json['password']
 
     if not username or not password:
         return make_api_response(message='参数错误：缺少用户名或密码', statusCode=400)
@@ -52,9 +60,6 @@ def logout():
     @apiGroup Users
     @apiVersion 0.0.1
     @apiDescription 用于用户退出登录
-    @apiParamExample {json} 请求样例：
-                  ?account=sodlinken&password=11223344&mobile=13739554137&vip=0&recommend=
-    @apiSuccess (200) {String} msg 信息
     @apiSuccess (200) {int} code 0 代表无错误 1代表有错误
     @apiSuccessExample {json} 返回样例:
                    {"status":"ok", "message": ""}
@@ -82,7 +87,18 @@ def register():
     @apiParam {String} phone 联系电话
     @apiParam {String} qq QQ
     @apiParamExample {json} 请求样例：
-                  ?account=sodlinken&password=11223344&mobile=13739554137&vip=0&recommend=
+                    {
+                        "username": "bs",
+                        "nickname": "guest",
+                        "realname": "132",
+                        "password": "pwd",
+                        "pwdquestion": "none",
+                        "pwdanswer": "none",
+                        "gender": "23",
+                        "mail": "xxx@xxx.com",
+                        "phone": 1231232,
+                        "qq":12312
+                    }
     @apiSuccess (200) {String} msg 信息
     @apiSuccess (200) {int} code 0 代表无错误 1代表有错误
     @apiSuccessExample {json} 返回样例:
@@ -94,23 +110,23 @@ def register():
                    {"status": "fail", "message": "参数错误：用户名已存在"}
     """
     # 获取参数
-    user_name = request.form['username']
-    display_name = request.form['nickname']
-    real_name = request.form['realname']
-    password = request.form['password']
-    pwd_question = request.form['pwdquestion']
-    pwd_answer = request.form['pwdanswer']
-    gender = request.form['gender']
-    mail = request.form['mail']
-    phone = request.form['phone']
-    qq = request.form['qq']
+    user_name = request.json['username']
+    display_name = request.json['nickname']
+    real_name = request.json['realname']
+    password = request.json['password']
+    pwd_question = request.json['pwdquestion']
+    pwd_answer = request.json['pwdanswer']
+    gender = request.json['gender']
+    mail = request.json['mail']
+    phone = request.json['phone']
+    qq = request.json['qq']
 
-    if not username or not password:
+    if not user_name or not password:
         return make_api_response(message='参数错误：缺少用户名或密码', statusCode=400)
 
-    account = UserService.query_account(user_name=user_name)
-    logger.debug(account)
-    if account is not None:
+    user = UserService.query_user(username=user_name)
+    logger.debug(user)
+    if user is not None:
         return make_api_response(message='用户名已存在', statusCode=400)
 
     userinfo = {
@@ -126,9 +142,9 @@ def register():
         'qq': qq
     }
     # 创建用户的操作
-    ok = UserService.create_account(userinfo)
+    ok = UserService.create_user(userinfo)
     if ok:
-        db.commit_all()
+        db.session.commit()
     else:
         err.message = '创建用户遇到错误'
     return make_api_response()

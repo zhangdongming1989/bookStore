@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+from flask_login import UserMixin
 from sqlalchemy.sql.schema import Column
 from sqlalchemy.sql.sqltypes import Integer, String, TIMESTAMP, DECIMAL
 
 from bookStore import db
 
-class User(db.Model):
+
+class User(db.Model, UserMixin):
     """
     登录会员表
     """
