@@ -11,11 +11,38 @@ from bookStore.views import make_api_response
 def query_user_info():
     """
     @api {POST} /profile/query 查询用户信息
+    @apiGroup Users
+    @apiVersion 0.0.1
+    @apiDescription 用于查询用户资料
+    @apiParam {String} username 用户账户名
+    @apiParamExample {json} 请求样例：
+                    {
+                        "username": "bs"
+                    }
+    @apiSuccess (200) {String} msg 信息
+    @apiSuccess (200) {int} code 0 代表无错误 1代表有错误
+    @apiSuccessExample {json} 返回样例:
+                   {
+                        "status": "ok",
+                        "payload":{
+                            "realname": "132",
+                            "username": "bs",
+                            "phone": "pwd",
+                            "mail": "xxx@xxx.com",
+                            "nickname": "guest",
+                            "gender": "23",
+                            "password": "pwd",
+                            "qq": "12312"
+                        }
+                    }
+    @apiError (400) {String} msg 信息
+    @apiErrorExample {json} 返回样例:
+                   {"status": "fail", "message": "用户不存在"}
     """
-    username = request.form('username')
+    username = request.json['username']
     userinfo = UserService.query_user(username=username)
 
-    if result:
+    if userinfo:
         return make_api_response(payload=userinfo)
     else:
         return make_api_response(message="用户不存在", statusCode=400)
@@ -24,30 +51,43 @@ def query_user_info():
 def update_user_info():
     """
     @api {POST} /profile/query 查询用户信息
+    @apiGroup Users
+    @apiVersion 0.0.1
+    @apiDescription 用于更新用户资料
+    @apiParam {String} username 用户账户名
+    @apiParamExample {json} 请求样例：
+                    {
+                        "realname": "132",
+                        "username": "bs",
+                        "phone": "1312312312",
+                        "mail": "xxx@xxx.com",
+                        "nickname": "guest",
+                        "gender": "23",
+                        "qq": "123122"
+                    }
+    @apiSuccess (200) {String} msg 信息
+    @apiSuccess (200) {int} code 0 代表无错误 1代表有错误
     """
     # 获取参数
-    user_name = request.form['username']
-    display_name = request.form['nickname']
-    real_name = request.form['realname']
-    gender = request.form['gender']
-    mail = request.form['mail']
-    phone = request.form['phone']
-    qq = request.form['qq']
+    user_name = request.json['username']
+    display_name = request.json['nickname']
+    real_name = request.json['realname']
+    gender = request.json['gender']
+    mail = request.json['mail']
+    phone = request.json['phone']
+    qq = request.json['qq']
 
     userinfo = {
         'username': user_name,
         'nickname': display_name,
         'realname': real_name,
-        'password': password,
         'gender': gender,
         'mail': mail,
         'phone': phone,
         'qq': qq
     }
     # 创建用户的操作
-    ok = UserService.create_account(userinfo)
-    if ok:
-        db.commit_all()
-    else:
-        err.message = '创建用户遇到错误'
+    ok = UserService.update_userinfo(userinfo)
+
     return make_api_response()
+

@@ -44,7 +44,7 @@ class UserService():
                 payload['nickname'] = rv.nickname
                 payload['realname'] = rv.realname
                 payload['password'] = rv.password
-                payload['phone'] = rv.password
+                payload['phone'] = rv.phone
                 payload['gender'] = rv.gender
                 payload['mail'] = rv.mail
                 payload['qq'] = rv.qq
