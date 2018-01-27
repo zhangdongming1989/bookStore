@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 @exports('/login', methods=['POST'])
 def login():
     """
-    @api {GET} /login 退出登录
+    @api {POST} /login 登录
     @apiGroup Users
     @apiVersion 0.0.1
-    @apiDescription 用于用户退出登录
+    @apiDescription 用于用户登录
     @apiParam {String} username 用户账户名
     @apiParam {String} password 密码
     @apiParamExample {json} 请求样例：
