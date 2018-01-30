@@ -48,7 +48,10 @@ def login():
         return make_api_response(message='用户名或密码错误', statusCode=400)
 
     login_user(user)
-    app.logger.info('%s Login' % user.user.username)
+    app.logger.info('%s Login' % user.username)
+
+
+
     return make_api_response()
 
 

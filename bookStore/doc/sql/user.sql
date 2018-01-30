@@ -17,4 +17,4 @@ CREATE TABLE `user` (
   UNIQUE KEY `phone` (`phone`),
   KEY `mail` (`mail`),
   KEY `nickname` (`nickname`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户信息主表';
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;

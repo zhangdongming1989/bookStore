@@ -2,12 +2,14 @@
 import logging
 
 from flask import request
+from flask_login import current_user, login_required
 from bookStore.service.user.user import UserService
 from bookStore.views.api import exports
 from bookStore.views import make_api_response
 
 
 @exports('/profile/query', methods=['POST'])
+@login_required
 def query_user_info():
     """
     @api {POST} /profile/query 查询用户信息
@@ -48,6 +50,7 @@ def query_user_info():
         return make_api_response(message="用户不存在", statusCode=400)
 
 @exports('/profile/update', methods=['POST'])
+@login_required
 def update_user_info():
     """
     @api {POST} /profile/query 查询用户信息

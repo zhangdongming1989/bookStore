@@ -2,6 +2,7 @@
 import logging
 
 from flask import request
+from flask_login import current_user, login_required
 from bookStore.mappings.order import Order
 from bookStore.mappings.order_detail import OrderDetail
 from bookStore.service.order.order import OrderService
@@ -10,6 +11,7 @@ from bookStore.views import make_api_response
 
 
 @exports('/order/query', methods=['GET'])
+@login_required
 def query_orders(userid=None):
     """
     @api {GET} /order/query 查询用户对应的订单信息
@@ -42,7 +44,7 @@ def query_orders(userid=None):
     @apiErrorExample {json} 返回样例:
                    {"status": "fail", "message": "用户不存在"}
     """
-    user_id = request.args.get('userid')
+    user_id = current_user.id
     orders = OrderService.order_query(user_id)
 
     if orders:
@@ -51,6 +53,7 @@ def query_orders(userid=None):
         return make_api_response(message="用户不存在", statusCode=400)
 
 @exports('/order/detail', methods=['GET'])
+@login_required
 def query_order_detail():
     """
     @api {GET} /order/detail 查询订单对应的书目详情
@@ -96,7 +99,7 @@ def query_order_detail():
                    {"status": "fail", "message": "用户不存在"}
     """
     # 获取参数
-    order_id = request.args.get('orderid')
+    order_id = current_user.id
     order_detail = OrderService.order_detail_query(order_id)
 
     if order_detail:
