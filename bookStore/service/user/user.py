@@ -2,6 +2,7 @@
 import hashlib
 from bookStore import db, app
 from bookStore.mappings.user import User
+from bookStore.mappings.account import Account
 
 
 class SiteUser():
@@ -58,7 +59,10 @@ class UserService():
     def create_user(userinfo):
         """
         创建新用户
+        1. user 表
+        2. account 表
         """
+        # 用户基本信息的user表
         user = User()
         user.username = userinfo['username']
         user.nickname = userinfo['nickname']
@@ -74,12 +78,18 @@ class UserService():
         db.session.add(user)
         db.session.flush()
 
+        # 用户账户的account表
+        account = Account()
+        account.user_id = user.id
+        db.session.add(account)
+        db.session.flush()
+
         return True
 
     @staticmethod
     def get(id):
         user = User.query.filter_by(id=id).first()
-        return SiteUser(user)
+        return user
 
     @staticmethod
     def login(username, password):
@@ -94,7 +104,7 @@ class UserService():
 
         user = User.query.filter_by(
             username=username, password=password).first()
-        return (user is not None, SiteUser(user))
+        return (user is not None, user)
 
     @staticmethod
     def get_usernames(user_ids):
